@@ -1,0 +1,263 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Home page";
+}
+<div>
+    <button type="button" style="margin:0px" class="btn btn-primary" data-toggle="modal" data-target="#addmodal">
+        Add User
+    </button><br /><br />
+    <table id="OfficeTable" class="table table-hover" style="width:100%">
+        <thead>
+            <tr>
+                <th class="table-office">ID Number</th>
+                <th class="table-office">Name</th>
+                <th class="table-office">Position</th>
+                <th class="table-office">Salary</th>
+                <th class="table-office-01">Action</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<!--Insert Modal-->
+<div class="modal fade" id="addmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label" style="font-size:20px">Name User :</label>
+                        <input type="text" class="form-control" id="add-name" placeholder="ชื่อ">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label" style="font-size:20px">Position :</label>
+                        <input type="text" class="form-control" id="add-position" placeholder="ตำแหน่ง">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label" style="font-size:20px">Salary :</label>
+                        <input type="text" class="form-control" id="add-salary" placeholder="จำนวนเงินเดือน">
+                    </div>                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="insertOffice">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Update Modal-->
+<div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Details</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label" style="font-size:20px">Name :</label>
+                        <input type="text" class="form-control" id="update-name" placeholder="ชื่อ">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label" style="font-size:20px">Position :</label>
+                        <input type="text" class="form-control" id="update-position" placeholder="ตำแหน่ง">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipient-name" class="col-form-label" style="font-size:20px">Salary :</label>
+                        <input type="text" class="form-control" id="update-salary" placeholder="จำนวนเงินเดือน">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="updateOffice">Update now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--CSS-->
+@section Styles{
+    <environment names="Development">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" />
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css" />
+
+    </environment>
+    <style>
+        table.dataTable thead tr {
+            background: blue;
+            color: white;
+            height: 30px;
+        }
+
+        .table-office{
+            text-align:center !important;
+        }
+
+        .table-office-01{
+            text-align: center !important;
+            width:15%;
+        }
+    </style>
+}
+
+
+@section Scripts{
+    <environment names="Development">
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script> 
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            OffTable();
+        });
+
+        function OffTable() {
+            const dem = "http://localhost:5256/api/Office";
+            $.ajax({
+                type: "GET",
+                url: dem +"/all",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",                                   //data type expected from server
+                success: function(response){
+                    console.log("response", response)
+
+                    var table = $("#OfficeTable").DataTable({
+                        "data" : response,
+                        "columns" : [{
+                            "data" : "idOf",
+                            "visible" : false
+                        },{
+                            "data" : "nameOf"
+                        },{
+                            "data" : "positionOf"
+                        },{
+                            "data" : "salaryOf"
+                        }, {
+                            "data": null,
+                            "classname": "center",
+                            "defaultContent": `
+                                       <button type="button" id="update-office-modal" class="btn btn-warning" data-toggle="modal" data-target="#updateModal">Edit</button>
+                                       &nbsp;&nbsp;<button type="button" id="deleteOffice" class="btn btn-danger" >Delete</button></a>
+                            `
+                        }]
+                    })
+
+                    //Insert 
+                    $("#insertOffice").click(function(){
+                        var name = $("#add-name").val();
+                        var position = $("#add-position").val();
+                        var salary = $("#add-salary").val();
+
+                        var user ={
+                            "nameOf" : name,
+                            "positionOf": position,
+                            "salaryOf": salary,
+                        }
+
+                        $.ajax({
+                            type:"POST",
+                            url: `${dem}/Insert`,
+                            data: JSON.stringify(user),
+                            dataType: "json",
+                            contentType: "application/json",
+                            success: function (response) {
+                                swal(
+                                    "Success!",
+                                    "ถูกต้องนะครับ",
+                                    "success").then((isSuccess) => {
+                                        if (isSuccess) {
+                                            window.location.reload()
+                                        }
+                                    });
+                            },
+                            error: function (error) {
+                                swal("Failed!", error.statusText, "error");
+                            }
+                        })
+                    });
+
+                    //Update
+                    $("button#update-office-modal").click(function(e){
+                        e.preventDefault();
+                        var row = table.row($(this).parents('tr'));
+                        var idtt = row.data()["idOf"];
+                        var namett = row.data()["nameOf"];
+                        var positiontt = row.data()["positionOf"];
+                        var salarytt = row.data()["salaryOf"];
+                        console.log("data",row.data()) //display resault
+
+                        $("#update-name").val(namett);
+                        $("#update-position").val(positiontt);
+                        $("#update-salary").val(salarytt);
+
+
+                        $("#updateOffice").click(function () {
+                            var name = $("#update-name").val();
+                            var position = $("#update-position").val();
+                            var salary = $("#update-salary").val();
+
+                            var user = {
+                                "nameOf": name,
+                                "positionOf": position,
+                                "salaryOf": salary,
+                            }
+                            $.ajax({
+                                type: "PUT",
+                                url: `${dem}/Update?id=${idtt}`, //ใช้ Alt+96 //Important
+                                data: JSON.stringify(user),
+                                dataType: "json",
+                                contentType: "application/json",
+                                success: function (response) {
+                                    swal(
+                                        "Edit Success!",
+                                        "",
+                                        "success").then((isSuccess) => {
+                                            if (isSuccess) {
+                                                window.location.reload()
+                                            }
+                                        });
+                                },
+                                error: function (error) {
+                                    swal("Failed!", error.statusText, "error");
+                                }
+                            })
+                        })
+                    })
+
+                    //Delete
+                    $("button#deleteOffice").click(function(e){
+                        e.preventDefault();
+                        var row = table.row($(this).parents('tr'));
+                        var id = row.data()["idOf"];
+                        console.log("idOf",id) // display resualt
+
+                        $.ajax({
+                            type: "DELETE",
+                            url: `${dem}/Delete?id=${id}`,
+                            success: function (response){
+                                row.remove().draw();
+                            }
+                        })
+                    })
+                }
+            })
+        }
+
+    </script>
+}
